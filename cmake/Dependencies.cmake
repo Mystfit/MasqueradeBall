@@ -1,0 +1,35 @@
+include(FetchContent)
+
+# FTXUI - Terminal UI library
+FetchContent_Declare(ftxui
+    GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
+    GIT_TAG v6.1.9
+    GIT_SHALLOW TRUE
+)
+
+# Box2D v3 - Physics engine
+set(BOX2D_SAMPLES OFF CACHE BOOL "" FORCE)
+set(BOX2D_BENCHMARKS OFF CACHE BOOL "" FORCE)
+set(BOX2D_DOCS OFF CACHE BOOL "" FORCE)
+set(BOX2D_PROFILE OFF CACHE BOOL "" FORCE)
+set(BOX2D_VALIDATE OFF CACHE BOOL "" FORCE)
+set(BOX2D_UNIT_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(box2d
+    GIT_REPOSITORY https://github.com/erincatto/box2d.git
+    GIT_TAG v3.1.0
+    GIT_SHALLOW TRUE
+    GIT_PROGRESS TRUE
+)
+
+FetchContent_MakeAvailable(ftxui box2d)
+
+# libgamepad - optional gamepad support
+option(ENABLE_GAMEPAD "Enable gamepad support via libgamepad" OFF)
+if(ENABLE_GAMEPAD)
+    FetchContent_Declare(libgamepad
+        GIT_REPOSITORY https://github.com/univrsal/libgamepad.git
+        GIT_TAG master
+        GIT_SHALLOW TRUE
+    )
+    FetchContent_MakeAvailable(libgamepad)
+endif()
