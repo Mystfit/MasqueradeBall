@@ -18,7 +18,7 @@ void InputManager::endFrame() {
     keyboard_.endFrame();
 
     // Poll gamepad
-    gamepad_.poll();
+    
     if (gamepad_.hadActivity()) {
         active_source_ = ActiveSource::Gamepad;
     }

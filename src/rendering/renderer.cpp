@@ -14,6 +14,6 @@ ftxui::Element Renderer::render(const SoftbodyBall& ball,
 
     return canvas(screen_width / 2, screen_height / 4, [&](Canvas& c) {
         // Draw the ball
-        ball_renderer_.draw(c, camera_, ball.getRimPositions());
+        ball_renderer_.draw(c, camera_, ball.getCenterPosition(), ball.getRimPositions());
     });
 }

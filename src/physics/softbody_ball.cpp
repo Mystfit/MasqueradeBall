@@ -110,7 +110,7 @@ SoftbodyBall::~SoftbodyBall() {
 
 void SoftbodyBall::applyMovement(float direction) {
     // Apply horizontal force to the core - friction will naturally cause rolling
-    float force_magnitude = direction * 15.0f; // Increased for better responsiveness
+    float force_magnitude = direction * 10.0f; // Increased for better responsiveness
     b2Vec2 force = {force_magnitude, 0.0f};
     b2Body_ApplyForceToCenter(core_id_, force, true);
 
@@ -163,9 +163,9 @@ void SoftbodyBall::releaseJump() {
 
     // Only jump if on ground
     if (isOnGround()) {
-        // Apply impulse scaled by compression time (reduced base strength)
+        // Apply impulse scaled by compression time
         float impulse_scale = 1.0f + (compression_time_ / MAX_COMPRESSION_TIME) * 1.5f;
-        float impulse_magnitude = 3.0f * impulse_scale; // Reduced from 8.0f
+        float impulse_magnitude = 3.0f * impulse_scale; // Doubled from 3.0f for higher jumps
         applyJumpImpulse(impulse_magnitude);
     }
 

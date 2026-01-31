@@ -47,6 +47,6 @@ private:
 
     void processInput(const InputSnapshot& input, float dt);
     void generateAheadOfCamera();
-    void checkFallThroughGap();
+    void checkFallOffWorld();
     void checkGoalReached();
 };

@@ -6,7 +6,8 @@
 #include <vector>
 
 struct LevelSegment {
-    std::string source_text;           // Original text for rendering
+    std::string source_text;           // Original text for terrain generation
+    std::string display_text;          // Text with 6-space word gaps (for text bar)
     std::vector<b2Vec2> spline_points; // Cubic spline control points
     std::vector<b2Vec2> sampled_points; // Densely sampled spline output
     float start_x = 0.0f;

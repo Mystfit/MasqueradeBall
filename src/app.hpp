@@ -5,6 +5,7 @@
 #include "ui/options_menu.hpp"
 #include "ui/hud.hpp"
 #include "ui/game_over_overlay.hpp"
+#include "ui/text_bar.hpp"
 #include "input/input_manager.hpp"
 #include "game/game_session.hpp"
 #include "rendering/renderer.hpp"

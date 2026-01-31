@@ -1,11 +1,11 @@
 #include "rendering/ball_renderer.hpp"
-#include "level/cubic_spline.hpp"
 
 #include <cmath>
 #include <algorithm>
 
 void BallRenderer::draw(ftxui::Canvas& canvas,
                         const Camera& camera,
+                        b2Vec2 core_position,
                         const std::vector<b2Vec2>& rim_positions) {
     if (rim_positions.empty()) {
         return;
@@ -14,17 +14,33 @@ void BallRenderer::draw(ftxui::Canvas& canvas,
     // Sort rim positions by angle from center
     std::vector<b2Vec2> sorted_rims = sortByAngle(rim_positions);
 
-    // Interpolate closed spline through rim positions
-    std::vector<b2Vec2> spline_points = CubicSpline::interpolateClosed(sorted_rims, 0.05f);
+    // Convert core to screen coords
+    auto core_screen = camera.worldToScreen(core_position);
 
-    // Draw the spline using braille mode
-    for (size_t i = 0; i < spline_points.size(); ++i) {
-        size_t next = (i + 1) % spline_points.size();
+    // Convert all rim positions to screen coords
+    std::vector<Camera::ScreenPos> rim_screen;
+    rim_screen.reserve(sorted_rims.size());
+    for (const auto& rim : sorted_rims) {
+        rim_screen.push_back(camera.worldToScreen(rim));
+    }
 
-        auto screen_a = camera.worldToScreen(spline_points[i]);
-        auto screen_b = camera.worldToScreen(spline_points[next]);
+    // Draw alternating filled / outline-only triangles
+    for (size_t i = 0; i < rim_screen.size(); ++i) {
+        size_t next = (i + 1) % rim_screen.size();
 
-        canvas.DrawPointLine(screen_a.x, screen_a.y, screen_b.x, screen_b.y);
+        int cx = core_screen.x, cy = core_screen.y;
+        int ax = rim_screen[i].x, ay = rim_screen[i].y;
+        int bx = rim_screen[next].x, by = rim_screen[next].y;
+
+        if (i % 2 == 0) {
+            // Filled triangle
+            fillTriangle(canvas, cx, cy, ax, ay, bx, by);
+        }
+
+        // Always draw the outline edges so every triangle has visible borders
+        canvas.DrawPointLine(cx, cy, ax, ay);
+        canvas.DrawPointLine(ax, ay, bx, by);
+        canvas.DrawPointLine(bx, by, cx, cy);
     }
 }
 
@@ -78,6 +94,52 @@ void BallRenderer::drawCircle(ftxui::Canvas& canvas,
         auto screen2 = camera.worldToScreen(p2);
 
         canvas.DrawPointLine(screen1.x, screen1.y, screen2.x, screen2.y);
+    }
+}
+
+void BallRenderer::fillTriangle(ftxui::Canvas& canvas,
+                                int x0, int y0,
+                                int x1, int y1,
+                                int x2, int y2) {
+    // Sort vertices by Y coordinate (top to bottom in screen space)
+    if (y0 > y1) { std::swap(x0, x1); std::swap(y0, y1); }
+    if (y0 > y2) { std::swap(x0, x2); std::swap(y0, y2); }
+    if (y1 > y2) { std::swap(x1, x2); std::swap(y1, y2); }
+
+    // Degenerate triangle
+    if (y0 == y2) return;
+
+    // Scanline fill
+    for (int y = y0; y <= y2; ++y) {
+        // Compute x range for this scanline by interpolating along edges
+        // Edge 0-2 always spans the full height
+        float t_long = static_cast<float>(y - y0) / (y2 - y0);
+        float x_long = x0 + t_long * (x2 - x0);
+
+        float x_short;
+        if (y < y1) {
+            // Upper half: edge 0-1
+            if (y1 == y0) {
+                x_short = static_cast<float>(x1);
+            } else {
+                float t = static_cast<float>(y - y0) / (y1 - y0);
+                x_short = x0 + t * (x1 - x0);
+            }
+        } else {
+            // Lower half: edge 1-2
+            if (y2 == y1) {
+                x_short = static_cast<float>(x1);
+            } else {
+                float t = static_cast<float>(y - y1) / (y2 - y1);
+                x_short = x1 + t * (x2 - x1);
+            }
+        }
+
+        int xa = static_cast<int>(x_long);
+        int xb = static_cast<int>(x_short);
+        if (xa > xb) std::swap(xa, xb);
+
+        canvas.DrawPointLine(xa, y, xb, y);
     }
 }
 

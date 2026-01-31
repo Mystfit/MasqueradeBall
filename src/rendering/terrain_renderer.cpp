@@ -32,31 +32,6 @@ void TerrainRenderer::drawSegment(ftxui::Canvas& canvas,
         canvas.DrawPointLine(screen_a.x, screen_a.y + 1, screen_b.x, screen_b.y + 1);
     }
 
-    // Draw text characters along the terrain
-    if (!segment.source_text.empty() && !segment.sampled_points.empty()) {
-        // Distribute text across the segment
-        float segment_width = segment.end_x - segment.start_x;
-        float char_spacing = segment_width / segment.source_text.length();
-
-        for (size_t i = 0; i < segment.source_text.length(); ++i) {
-            float x = segment.start_x + i * char_spacing;
-
-            // Find closest sampled point
-            b2Vec2 closest = segment.sampled_points[0];
-            float min_dist = fabsf(closest.x - x);
-            for (const auto& pt : segment.sampled_points) {
-                float dist = fabsf(pt.x - x);
-                if (dist < min_dist) {
-                    min_dist = dist;
-                    closest = pt;
-                }
-            }
-
-            auto screen_pos = camera.worldToScreen(closest);
-            std::string ch(1, segment.source_text[i]);
-            canvas.DrawText(screen_pos.x, screen_pos.y, ch);
-        }
-    }
 }
 
 void TerrainRenderer::drawGoal(ftxui::Canvas& canvas,

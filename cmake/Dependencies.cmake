@@ -3,7 +3,7 @@ include(FetchContent)
 # FTXUI - Terminal UI library
 FetchContent_Declare(ftxui
     GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
-    GIT_TAG v6.1.9
+    GIT_TAG main
     GIT_SHALLOW TRUE
 )
 
@@ -22,6 +22,11 @@ FetchContent_Declare(box2d
 )
 
 FetchContent_MakeAvailable(ftxui box2d)
+
+# Suppress -Werror=maybe-uninitialized in Box2D (GCC false positive in optimized builds)
+if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    target_compile_options(box2d PRIVATE -Wno-error=maybe-uninitialized)
+endif()
 
 # libgamepad - optional gamepad support
 option(ENABLE_GAMEPAD "Enable gamepad support via libgamepad" OFF)

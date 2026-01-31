@@ -15,7 +15,10 @@ App::App(std::unique_ptr<StdinReader> stdin_reader)
     renderer_ = std::make_unique<Renderer>();
     hud_ = std::make_unique<HUD>();
     game_over_overlay_ = std::make_unique<GameOverOverlay>();
-
+    
+    // Enable stdin
+    screen_.HandlePipedInput(true);
+    
     // Initialize camera at ball starting position
     renderer_->camera().update({5.0f, 10.0f}, 1.0f);
 }
@@ -138,8 +141,8 @@ ftxui::Component App::buildGameComponent() {
         auto game_canvas = canvas(screen_width / 2, screen_height / 2, [this, screen_width, screen_height](Canvas& c) {
             auto& camera = renderer_->camera();
 
-            // Update camera screen size for proper centering
-            camera.setScreenSize(screen_width / 2, screen_height / 2);
+            // Update camera screen size in braille pixels for proper centering
+            camera.setScreenSize(screen_width, screen_height);
 
             // Draw terrain
             TerrainRenderer terrain_renderer;
@@ -147,21 +150,41 @@ ftxui::Component App::buildGameComponent() {
 
             // Draw ball in DEBUG mode - shows physics bodies and constraints
             BallRenderer ball_renderer;
-            //ball_renderer.draw(c, camera, game_session_->ball().getRimPositions());
-            ball_renderer.drawDebug(c, camera,
-                                   game_session_->ball().getCenterPosition(),
-                                   game_session_->ball().getRimPositions(),
-                                   0.15f,  // core radius
-                                   0.05f); // rim radius
+            ball_renderer.draw(c, camera,
+                               game_session_->ball().getCenterPosition(),
+                               game_session_->ball().getRimPositions());
+            // ball_renderer.drawDebug(c, camera,
+            //                        game_session_->ball().getCenterPosition(),
+            //                        game_session_->ball().getRimPositions(),
+            //                        0.15f,  // core radius
+            //                        0.05f); // rim radius
         });
 
         // Build UI layers
         auto hud_element = hud_->render(game_session_->score(),
                                         game_session_->speedMultiplier());
 
+        // Build text bar overlay at bottom third of screen
+        auto& camera = renderer_->camera();
+        TextBar text_bar;
+        auto text_bar_element = text_bar.render(
+            game_session_->segments(),
+            camera.viewportLeft(),
+            camera.viewportRight(),
+            screen_.dimx(),
+            screen_width  // Pass braille pixel width for proper scaling
+        );
+
         auto game_view = vbox({
             hud_element,
-            game_canvas | flex,
+            dbox({
+                game_canvas | flex,
+                vbox({
+                    filler() | flex_grow,
+                    text_bar_element,
+                    filler() | size(HEIGHT, EQUAL, 2),
+                }),
+            }) | flex,
         });
 
         // Overlay game over if needed

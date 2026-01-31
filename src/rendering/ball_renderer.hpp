@@ -11,9 +11,10 @@ class BallRenderer {
 public:
     BallRenderer() = default;
 
-    // Draw ball given rim positions
+    // Draw ball as alternating filled/unfilled triangles from core to rim pairs
     void draw(ftxui::Canvas& canvas,
               const Camera& camera,
+              b2Vec2 core_position,
               const std::vector<b2Vec2>& rim_positions);
 
     // Debug draw mode showing physics bodies
@@ -32,4 +33,10 @@ private:
                     const Camera& camera,
                     b2Vec2 center,
                     float radius);
+
+    // Scanline-fill a triangle in screen (braille) coordinates
+    void fillTriangle(ftxui::Canvas& canvas,
+                      int x0, int y0,
+                      int x1, int y1,
+                      int x2, int y2);
 };
