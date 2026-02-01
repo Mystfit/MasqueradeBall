@@ -1,0 +1,6 @@
+#pragma once
+
+// Asset directory path - configured at CMake time.
+// Development builds: relative "assets" (run from build directory)
+// Installed builds: absolute "/usr/share/masquerade-ball" (or equivalent)
+#define MASQUERADE_ASSETS_DIR "@MASQUERADE_ASSETS_DIR@"

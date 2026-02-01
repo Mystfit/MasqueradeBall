@@ -1,4 +1,5 @@
 #include "level/stdin_reader.hpp"
+#include "config.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -40,7 +41,7 @@ void StdinReader::readerLoop() {
         }
     } else {
         // Load lorem ipsum fallback
-        std::ifstream file("assets/lorem_ipsum.txt");
+        std::ifstream file(std::string(MASQUERADE_ASSETS_DIR) + "/lorem_ipsum.txt");
         if (file.is_open()) {
             std::string line;
             while (running_.load() && std::getline(file, line)) {

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Masquerade Ball
+Comment=Terminal-based side-scrolling physics platformer inspired by Vib-Ribbon
+Exec=masquerade_ball
+Terminal=true
+Categories=Game;ArcadeGame;
+Keywords=terminal;platformer;physics;softbody;

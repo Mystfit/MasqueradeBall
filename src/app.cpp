@@ -1,4 +1,5 @@
 #include "app.hpp"
+#include "config.hpp"
 #include "input/kitty_keyboard.hpp"
 
 #include <ftxui/component/loop.hpp>
@@ -39,7 +40,7 @@ App::App(std::unique_ptr<StdinReader> stdin_reader)
     input_manager_ = std::make_unique<InputManager>();
     game_session_ = std::make_unique<GameSession>(*stdin_reader_);
     renderer_ = std::make_unique<Renderer>();
-    mask_renderer_ = std::make_unique<MaskRenderer>("assets/mask.png");
+    mask_renderer_ = std::make_unique<MaskRenderer>(std::string(MASQUERADE_ASSETS_DIR) + "/mask.png");
     hud_ = std::make_unique<HUD>();
 
     // Enable stdin

@@ -1,13 +1,14 @@
 include(FetchContent)
 
 # FTXUI - Terminal UI library
+set(FTXUI_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(ftxui
     GIT_REPOSITORY https://github.com/ArthurSonzogni/FTXUI.git
     GIT_TAG main
     GIT_SHALLOW TRUE
 )
 
-# Box2D v3 - Physics engine
+# Box2D v3 - Physics engine (EXCLUDE_FROM_ALL prevents its install rules from leaking)
 set(BOX2D_SAMPLES OFF CACHE BOOL "" FORCE)
 set(BOX2D_BENCHMARKS OFF CACHE BOOL "" FORCE)
 set(BOX2D_DOCS OFF CACHE BOOL "" FORCE)
@@ -19,6 +20,7 @@ FetchContent_Declare(box2d
     GIT_TAG v3.1.0
     GIT_SHALLOW TRUE
     GIT_PROGRESS TRUE
+    EXCLUDE_FROM_ALL
 )
 
 # stb - Single-file public domain libraries (stb_image for PNG loading)
