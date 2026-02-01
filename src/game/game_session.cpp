@@ -97,8 +97,32 @@ void GameSession::generateAheadOfCamera() {
 void GameSession::checkFallOffWorld() {
     b2Vec2 ball_pos = ball_->getCenterPosition();
 
-    // Safety net: if ball somehow falls far below terrain
-    if (ball_pos.y < -5.0f) {
+    // Find the terrain segment at the ball's current X position
+    float terrain_y = 0.0f;  // Default to Y=0 if no segments yet
+    bool found_segment = false;
+
+    for (const auto& segment : segments_) {
+        if (ball_pos.x >= segment.start_x && ball_pos.x <= segment.end_x) {
+            // Found the segment containing the ball - use its average Y as reference
+            // (Simple approximation: average of all sampled points)
+            if (!segment.sampled_points.empty()) {
+                float sum_y = 0.0f;
+                for (const auto& pt : segment.sampled_points) {
+                    sum_y += pt.y;
+                }
+                terrain_y = sum_y / segment.sampled_points.size();
+                found_segment = true;
+                break;
+            }
+        }
+    }
+
+    // Safety net: if ball falls 5 meters below the local terrain height
+    // (works for both uphill, downhill, and sloped terrain)
+    if (found_segment && ball_pos.y < terrain_y - 5.0f) {
+        game_over_ = true;
+    } else if (!found_segment && ball_pos.y < -5.0f) {
+        // Fallback: absolute check if we haven't generated terrain yet
         game_over_ = true;
     }
 }

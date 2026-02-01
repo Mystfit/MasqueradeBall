@@ -20,6 +20,10 @@ public:
 
 private:
     static constexpr float Y_SMOOTHING_FACTOR = 0.3f;  // Reduced to allow more variation
+    static constexpr float MACRO_BASE_FREQUENCY = 0.15f;  // 10x lower than micro's 1.5
+    static constexpr float MACRO_AMPLITUDE = 1.5f;         // Meters (compensates for EMA dampening)
+    static constexpr float DOWNWARD_SLOPE = 0.003f;        // Meters drop per meter of X-travel
+    static constexpr float MAX_HEIGHT_VARIATION = 1.2f;     // Widened per-point clamp (was 0.8 local)
 
     StdinReader& reader_;
     float current_x_ = 0.0f;
@@ -31,6 +35,7 @@ private:
     int segments_generated_ = 0;
     std::mt19937 rng_;
     PerlinNoise perlin_;
+    PerlinNoise macro_perlin_;
     bool level_complete_ = false;
 
 

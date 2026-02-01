@@ -10,7 +10,8 @@
 LevelGenerator::LevelGenerator(StdinReader& reader)
     : reader_(reader),
       rng_(std::random_device{}()),
-      perlin_(std::random_device{}()) {}
+      perlin_(std::random_device{}()),
+      macro_perlin_(std::random_device{}()) {}
 
 std::optional<LevelSegment> LevelGenerator::generateNext() {
     if (level_complete_) {
@@ -44,7 +45,6 @@ LevelSegment LevelGenerator::generateSegmentFromText(const std::string& line) {
 
     // Each display character = 0.15 world units (matches text bar character width)
     constexpr float chars_to_world = 0.15f;
-    constexpr float max_height_variation = 0.8f;
     constexpr int sample_interval = 5; // Sample every 5th character
 
     float segment_width = static_cast<float>(segment.display_text.length()) * chars_to_world;
@@ -66,6 +66,7 @@ LevelSegment LevelGenerator::generateSegmentFromText(const std::string& line) {
     // Calculate frequency based on total line length for smoother terrain
     float line_length = static_cast<float>(segment.display_text.length());
     float frequency = 1.5f / std::max(1.0f, line_length / 10.0f);
+    float macro_frequency = MACRO_BASE_FREQUENCY / std::max(1.0f, line_length / 10.0f);
 
     for (size_t i = 0; i < segment.display_text.length(); ++i) {
         bool is_first = (i == 0);
@@ -86,12 +87,23 @@ LevelSegment LevelGenerator::generateSegmentFromText(const std::string& line) {
                     y = last_segment_end_y_;
                 }
             } else {
-                // Multi-octave Perlin noise for natural terrain
-                float noise_value = perlin_.octaveNoise(x, frequency, 2, 0.5f);
-                y = smoothed_y_ + noise_value * max_height_variation;
+                // Micro noise: per-character terrain detail
+                float micro_noise = perlin_.octaveNoise(x, frequency, 2, 0.5f);
+
+                // Macro noise: broad hills and valleys
+                float macro_noise = macro_perlin_.octaveNoise(x, macro_frequency, 2, 0.5f);
+
+                // Downward slope: gentle monotonic descent
+                float slope_offset = -DOWNWARD_SLOPE * x;
+
+                // Combine all layers on top of the smoothed baseline
+                y = smoothed_y_
+                    + micro_noise * 0.8f
+                    + macro_noise * MACRO_AMPLITUDE
+                    + slope_offset;
 
                 // Constrain Y to prevent steep jumps between consecutive points
-                y = std::clamp(y, current_y_ - max_height_variation, current_y_ + max_height_variation);
+                y = std::clamp(y, current_y_ - MAX_HEIGHT_VARIATION, current_y_ + MAX_HEIGHT_VARIATION);
             }
 
             segment.spline_points.push_back({x, y});
@@ -136,6 +148,8 @@ LevelSegment LevelGenerator::generateSegmentFromText(const std::string& line) {
                   segment.sampled_points.back().y, ")");
         DEBUG_LOG("  Total sampled points: ", segment.sampled_points.size());
         DEBUG_LOG("  Captured endpoint: (", last_segment_end_x_, ", ", last_segment_end_y_, ")");
+        DEBUG_LOG("  macro_freq=", std::setprecision(5), macro_frequency,
+                  " slope_at_end=", std::setprecision(3), -DOWNWARD_SLOPE * segment.end_x);
     }
 
     // No gap between segments — continuous terrain
