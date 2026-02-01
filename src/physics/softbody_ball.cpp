@@ -35,6 +35,7 @@ SoftbodyBall::SoftbodyBall(b2WorldId world_id, b2Vec2 start_pos)
         rim_def.type = b2_dynamicBody;
         rim_def.position = rim_pos;
         rim_def.linearDamping = 0.3f;
+        rim_def.isBullet = true; // CCD prevents tunneling through terrain
         rim_ids_[i] = b2CreateBody(world_id, &rim_def);
 
         // Add rim shape
@@ -62,6 +63,9 @@ SoftbodyBall::SoftbodyBall(b2WorldId world_id, b2Vec2 start_pos)
         jd.enableSpring = true;
         jd.hertz = SPRING_HERTZ;
         jd.dampingRatio = SPRING_DAMPING;
+        jd.enableLimit = true;
+        jd.minLength = length * 0.5f;  // Prevent ring from collapsing
+        jd.maxLength = length * 1.5f;  // Prevent excessive stretching
         jd.collideConnected = false;
 
         rim_joints_.push_back(b2CreateDistanceJoint(world_id, &jd));
@@ -78,6 +82,9 @@ SoftbodyBall::SoftbodyBall(b2WorldId world_id, b2Vec2 start_pos)
         jd.enableSpring = true;
         jd.hertz = SPRING_HERTZ;
         jd.dampingRatio = SPRING_DAMPING;
+        jd.enableLimit = true;
+        jd.minLength = BALL_RADIUS * 0.5f;  // Hard floor — prevents rim collapse through terrain
+        jd.maxLength = BALL_RADIUS * 1.2f;  // Prevents excessive stretching
         jd.collideConnected = false;
 
         spoke_joints_.push_back(b2CreateDistanceJoint(world_id, &jd));

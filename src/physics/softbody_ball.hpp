@@ -27,12 +27,12 @@ public:
 
     // Constants - tuned for testing
     static constexpr int RIM_COUNT = 12;
-    static constexpr float BALL_RADIUS = 0.5f; // Smaller for testing
-    static constexpr float RIM_CIRCLE_RADIUS = 0.12f;  // Proportional to radius
-    static constexpr float CORE_RADIUS = 0.5f;
-    static constexpr float SPRING_HERTZ = 8.0f;
+    static constexpr float BALL_RADIUS = 0.5f;
+    static constexpr float RIM_CIRCLE_RADIUS = 0.15f;  // Larger for robust collision
+    static constexpr float CORE_RADIUS = 0.15f;        // Small core — rim handles terrain contact
+    static constexpr float SPRING_HERTZ = 12.0f;       // Stiffer springs resist deformation
     static constexpr float SPRING_DAMPING = 0.9f;
-    static constexpr float FORCE_MAGNITUDE = 30.0f;
+    static constexpr float FORCE_MAGNITUDE = 8.0f;
     static constexpr float ROLL_TORQUE = 7.5f;
 
 private:
