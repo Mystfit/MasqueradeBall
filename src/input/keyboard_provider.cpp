@@ -52,6 +52,39 @@ bool KeyboardProvider::handleEvent(const ftxui::Event& event) {
     return false;
 }
 
+void KeyboardProvider::handlePress(kitty::GameKey key) {
+    had_activity_ = true;
+    setKeyState(key, true);
+}
+
+void KeyboardProvider::handleRelease(kitty::GameKey key) {
+    had_activity_ = true;
+    setKeyState(key, false);
+}
+
+void KeyboardProvider::setKeyState(kitty::GameKey key, bool pressed) {
+    switch (key) {
+        case kitty::GameKey::Left:    left_ = pressed; break;
+        case kitty::GameKey::Right:   right_ = pressed; break;
+        case kitty::GameKey::Up:      up_ = pressed; break;
+        case kitty::GameKey::Down:    down_ = pressed; break;
+        case kitty::GameKey::Space:   jump_ = pressed; break;
+        case kitty::GameKey::Enter:
+            confirm_ = pressed;
+            break;
+        case kitty::GameKey::Escape:
+            pause_ = pressed;
+            back_ = pressed;
+            break;
+        case kitty::GameKey::Unknown:
+            break;
+    }
+}
+
+void KeyboardProvider::setKittyMode(bool enabled) {
+    kitty_mode_ = enabled;
+}
+
 void KeyboardProvider::beginFrame() {
     // Save previous states for edge detection
     prev_left_ = left_;
@@ -63,20 +96,27 @@ void KeyboardProvider::beginFrame() {
     prev_back_ = back_;
     prev_pause_ = pause_;
 
-    // Clear event flags for this frame
-    left_event_this_frame_ = false;
-    right_event_this_frame_ = false;
-    up_event_this_frame_ = false;
-    down_event_this_frame_ = false;
-    jump_event_this_frame_ = false;
-    confirm_event_this_frame_ = false;
-    back_event_this_frame_ = false;
-    pause_event_this_frame_ = false;
+    // Clear event flags for this frame (only needed for timeout mode)
+    if (!kitty_mode_) {
+        left_event_this_frame_ = false;
+        right_event_this_frame_ = false;
+        up_event_this_frame_ = false;
+        down_event_this_frame_ = false;
+        jump_event_this_frame_ = false;
+        confirm_event_this_frame_ = false;
+        back_event_this_frame_ = false;
+        pause_event_this_frame_ = false;
+    }
 
     had_activity_ = false;
 }
 
 void KeyboardProvider::endFrame() {
+    // In kitty mode, we get real release events - no timeout needed
+    if (kitty_mode_) {
+        return;
+    }
+
     // Timeout-based release detection: increment frame counters for keys that didn't
     // receive an event this frame, and clear them after RELEASE_TIMEOUT_FRAMES.
     // This tolerates the OS key-repeat delay while still detecting releases.

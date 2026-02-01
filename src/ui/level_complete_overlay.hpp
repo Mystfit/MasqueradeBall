@@ -6,21 +6,21 @@
 #include <ftxui/dom/elements.hpp>
 
 #include <functional>
+#include <string>
 
-class GameOverOverlay {
+class LevelCompleteOverlay {
 public:
-    explicit GameOverOverlay(std::function<void(GameState)> on_transition,
-                            std::function<void()> on_restart);
+    explicit LevelCompleteOverlay(std::function<void(GameState)> on_transition);
 
     // Returns the menu component for event handling
     ftxui::Component component();
 
-    // Renders the game over overlay as a centered dialog
-    ftxui::Element render();
+    // Renders the level complete overlay as a centered dialog
+    // Pass the final score to display
+    ftxui::Element render(int final_score);
 
 private:
     std::function<void(GameState)> on_transition_;
-    std::function<void()> on_restart_;
     std::vector<std::string> entries_;
     int selected_ = 0;
     ftxui::Component menu_component_;

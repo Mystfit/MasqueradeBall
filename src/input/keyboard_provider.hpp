@@ -1,13 +1,21 @@
 #pragma once
 
 #include "input/input_action.hpp"
+#include "input/kitty_keyboard.hpp"
 
 #include <ftxui/component/event.hpp>
 
 class KeyboardProvider {
 public:
     // Process an FTXUI event. Returns true if the event was consumed.
+    // Used when kitty protocol is not active (menu states).
     bool handleEvent(const ftxui::Event& event);
+
+    // Process a kitty keyboard press event. Sets key state immediately.
+    void handlePress(kitty::GameKey key);
+
+    // Process a kitty keyboard release event. Clears key state immediately.
+    void handleRelease(kitty::GameKey key);
 
     // Call once per frame before reading snapshot to detect releases.
     void beginFrame();
@@ -18,7 +26,17 @@ public:
     InputSnapshot snapshot() const;
     bool hadActivity() const { return had_activity_; }
 
+    // Enable/disable kitty mode. When enabled, timeout-based release
+    // detection is skipped (we get real release events instead).
+    void setKittyMode(bool enabled);
+    bool kittyMode() const { return kitty_mode_; }
+
 private:
+    // Set or clear the boolean for a given game key
+    void setKeyState(kitty::GameKey key, bool pressed);
+
+    bool kitty_mode_ = false;
+
     // Current frame key states (persistent until release detected)
     bool left_ = false;
     bool right_ = false;

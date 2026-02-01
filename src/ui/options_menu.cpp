@@ -3,15 +3,19 @@
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
 
-OptionsMenu::OptionsMenu(std::function<void(GameState)> on_transition)
+OptionsMenu::OptionsMenu(std::function<void(GameState)> on_transition, bool* debug_enabled)
     : on_transition_(std::move(on_transition)),
-      entries_({"Option 1", "Option 2", "Option 3", "Back"}) {
+      debug_enabled_(debug_enabled),
+      entries_({"Debug: Off", "Option 2", "Option 3", "Back"}) {
 
     using namespace ftxui;
 
     auto option = MenuOption::Vertical();
     option.on_enter = [this] {
-        if (selected_ == static_cast<int>(entries_.size()) - 1) {
+        if (selected_ == 0) {
+            *debug_enabled_ = !(*debug_enabled_);
+            entries_[0] = *debug_enabled_ ? "Debug: On" : "Debug: Off";
+        } else if (selected_ == static_cast<int>(entries_.size()) - 1) {
             on_transition_(GameState::StartMenu);
         }
     };

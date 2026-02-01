@@ -1,22 +1,24 @@
-#include "ui/game_over_overlay.hpp"
+#include "ui/pause_menu.hpp"
 
 #include <ftxui/component/component.hpp>
 #include <ftxui/dom/elements.hpp>
 
-GameOverOverlay::GameOverOverlay(std::function<void(GameState)> on_transition,
-                                 std::function<void()> on_restart)
+PauseMenu::PauseMenu(std::function<void(GameState)> on_transition,
+                     std::function<void()> on_restart)
     : on_transition_(std::move(on_transition)),
       on_restart_(std::move(on_restart)),
-      entries_({"Restart", "Main Menu"}) {
+      entries_({"Resume", "Restart", "Main Menu"}) {
 
     using namespace ftxui;
 
     auto option = MenuOption::Vertical();
     option.on_enter = [this] {
         if (selected_ == 0) {
-            on_restart_();
             on_transition_(GameState::Playing);
         } else if (selected_ == 1) {
+            on_restart_();
+            on_transition_(GameState::Playing);
+        } else if (selected_ == 2) {
             on_transition_(GameState::StartMenu);
         }
     };
@@ -31,20 +33,20 @@ GameOverOverlay::GameOverOverlay(std::function<void(GameState)> on_transition,
     menu_component_ = Menu(&entries_, &selected_, option);
 }
 
-ftxui::Component GameOverOverlay::component() {
+ftxui::Component PauseMenu::component() {
     return menu_component_;
 }
 
-ftxui::Element GameOverOverlay::render() {
+ftxui::Element PauseMenu::render() {
     using namespace ftxui;
 
     return vbox({
-        text("GAME OVER") | bold | center,
+        text("PAUSED") | bold | center,
         text(""),
         separator(),
         text(""),
         menu_component_->Render(),
         text(""),
-        text("Press Enter to select") | dim | center,
+        text("Press Escape to resume") | dim | center,
     }) | border | size(WIDTH, EQUAL, 40);
 }

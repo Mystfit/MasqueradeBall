@@ -110,12 +110,12 @@ SoftbodyBall::~SoftbodyBall() {
 
 void SoftbodyBall::applyMovement(float direction) {
     // Apply horizontal force to the core - friction will naturally cause rolling
-    float force_magnitude = direction * 10.0f; // Increased for better responsiveness
+    float force_magnitude = direction * FORCE_MAGNITUDE; // Increased for better responsiveness
     b2Vec2 force = {force_magnitude, 0.0f};
     b2Body_ApplyForceToCenter(core_id_, force, true);
 
     // Also apply a moderate torque to help initiate rolling
-    float torque = direction * 5.0f;
+    float torque = direction * ROLL_TORQUE;
     b2Body_ApplyTorque(core_id_, torque, true);
 }
 

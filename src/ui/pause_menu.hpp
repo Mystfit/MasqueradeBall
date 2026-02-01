@@ -7,15 +7,15 @@
 
 #include <functional>
 
-class GameOverOverlay {
+class PauseMenu {
 public:
-    explicit GameOverOverlay(std::function<void(GameState)> on_transition,
-                            std::function<void()> on_restart);
+    explicit PauseMenu(std::function<void(GameState)> on_transition,
+                       std::function<void()> on_restart);
 
     // Returns the menu component for event handling
     ftxui::Component component();
 
-    // Renders the game over overlay as a centered dialog
+    // Renders the pause menu as an overlay (centered dialog)
     ftxui::Element render();
 
 private:

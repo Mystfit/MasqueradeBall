@@ -3,6 +3,7 @@
 #include "game/scoring.hpp"
 #include "physics/physics_world.hpp"
 #include "physics/softbody_ball.hpp"
+#include "physics/mask_body.hpp"
 #include "physics/terrain_body.hpp"
 #include "level/level_generator.hpp"
 #include "level/level_segment.hpp"
@@ -19,6 +20,7 @@ public:
 
     // Accessors for rendering
     const SoftbodyBall& ball() const { return *ball_; }
+    const MaskBody& mask() const { return *mask_; }
     const std::vector<LevelSegment>& segments() const { return segments_; }
     int score() const { return scoring_.score(); }
     float speedMultiplier() const { return scoring_.multiplier(); }
@@ -32,6 +34,7 @@ public:
 private:
     PhysicsWorld physics_;
     std::unique_ptr<SoftbodyBall> ball_;
+    std::unique_ptr<MaskBody> mask_;
     TerrainBody terrain_;
     LevelGenerator level_gen_;
     Scoring scoring_;

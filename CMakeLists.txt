@@ -21,6 +21,7 @@ target_link_libraries(masquerade_ball PRIVATE
     ftxui::dom
     ftxui::screen
     box2d
+    stb_image
 )
 
 if(ENABLE_GAMEPAD)

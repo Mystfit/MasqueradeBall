@@ -64,7 +64,7 @@ void BallRenderer::drawDebug(ftxui::Canvas& canvas,
         // Draw constraint line from core to rim (spokes)
         auto core_screen = camera.worldToScreen(core_position);
         auto rim_screen = camera.worldToScreen(rim_pos);
-        //canvas.DrawPointLine(core_screen.x, core_screen.y, rim_screen.x, rim_screen.y);
+        canvas.DrawPointLine(core_screen.x, core_screen.y, rim_screen.x, rim_screen.y);
     }
 
     // Draw ring constraints between adjacent rims

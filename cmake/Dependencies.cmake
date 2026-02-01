@@ -21,7 +21,18 @@ FetchContent_Declare(box2d
     GIT_PROGRESS TRUE
 )
 
-FetchContent_MakeAvailable(ftxui box2d)
+# stb - Single-file public domain libraries (stb_image for PNG loading)
+FetchContent_Declare(stb
+    GIT_REPOSITORY https://github.com/nothings/stb.git
+    GIT_TAG master
+    GIT_SHALLOW TRUE
+)
+
+FetchContent_MakeAvailable(ftxui box2d stb)
+
+# Create interface target for stb_image (header-only)
+add_library(stb_image INTERFACE)
+target_include_directories(stb_image INTERFACE ${stb_SOURCE_DIR})
 
 # Suppress -Werror=maybe-uninitialized in Box2D (GCC false positive in optimized builds)
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")

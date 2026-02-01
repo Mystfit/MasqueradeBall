@@ -7,6 +7,7 @@ GameSession::GameSession(StdinReader& stdin_reader)
     // Create ball at starting position (above the terrain which starts at Y=0)
     b2Vec2 start_pos = {5.0f, 3.0f};
     ball_ = std::make_unique<SoftbodyBall>(physics_.worldId(), start_pos);
+    mask_ = std::make_unique<MaskBody>(physics_.worldId(), ball_->getCoreBodyId(), 0.3f);
     last_ball_x_ = start_pos.x;
 
     // Generate initial terrain segments
@@ -125,6 +126,7 @@ void GameSession::restart() {
     // Recreate ball
     b2Vec2 start_pos = {5.0f, 3.0f};
     ball_ = std::make_unique<SoftbodyBall>(physics_.worldId(), start_pos);
+    mask_ = std::make_unique<MaskBody>(physics_.worldId(), ball_->getCoreBodyId(), 0.3f);
 
     // Reset state
     game_over_ = false;

@@ -23,13 +23,17 @@ public:
     float getSpeed() const;
     bool isOnGround() const;
 
+    b2BodyId getCoreBodyId() const { return core_id_; }
+
     // Constants - tuned for testing
-    static constexpr int RIM_COUNT = 16;
+    static constexpr int RIM_COUNT = 12;
     static constexpr float BALL_RADIUS = 0.5f; // Smaller for testing
     static constexpr float RIM_CIRCLE_RADIUS = 0.12f;  // Proportional to radius
-    static constexpr float CORE_RADIUS = 0.15f;
+    static constexpr float CORE_RADIUS = 0.5f;
     static constexpr float SPRING_HERTZ = 8.0f;
-    static constexpr float SPRING_DAMPING = 0.7f;
+    static constexpr float SPRING_DAMPING = 0.9f;
+    static constexpr float FORCE_MAGNITUDE = 30.0f;
+    static constexpr float ROLL_TORQUE = 7.5f;
 
 private:
     b2WorldId world_id_;
