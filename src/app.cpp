@@ -110,7 +110,11 @@ ftxui::Component App::buildUI() {
     using namespace ftxui;
 
     auto transition = [this](GameState state) { transitionTo(state); };
-    auto restart = [this]() { game_session_->restart(); };
+    auto restart = [this]() {
+        game_session_->restart();
+        // Reset camera to ball's starting position
+        renderer_->camera().update(game_session_->ball().getCenterPosition(), 1.0f);
+    };
 
     start_menu_ = std::make_unique<StartMenu>(transition);
     options_menu_ = std::make_unique<OptionsMenu>(transition, &debug_enabled_);

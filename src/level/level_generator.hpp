@@ -18,6 +18,8 @@ public:
 
     float currentX() const { return current_x_; }
 
+    void reset();
+
 private:
     static constexpr float Y_SMOOTHING_FACTOR = 0.3f;  // Reduced to allow more variation
     static constexpr float MACRO_BASE_FREQUENCY = 0.15f;  // 10x lower than micro's 1.5

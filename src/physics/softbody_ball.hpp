@@ -15,7 +15,7 @@ public:
     void applyJumpImpulse(float magnitude);
     void startCompression(); // Begin held jump
     void updateCompression(float dt); // Continue compression while held
-    void releaseJump(); // Release after compression
+    void releaseJump(float input_direction = 0.0f); // Release after compression with directional control
 
     // State queries
     b2Vec2 getCenterPosition() const;

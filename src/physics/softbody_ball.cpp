@@ -158,7 +158,7 @@ void SoftbodyBall::updateCompression(float dt) {
     b2Body_SetLinearVelocity(core_id_, velocity);
 }
 
-void SoftbodyBall::releaseJump() {
+void SoftbodyBall::releaseJump(float input_direction) {
     if (!compressing_) {
         return;
     }
@@ -170,10 +170,30 @@ void SoftbodyBall::releaseJump() {
 
     // Only jump if on ground
     if (isOnGround()) {
-        // Apply impulse scaled by compression time
-        float impulse_scale = 1.0f + (compression_time_ / MAX_COMPRESSION_TIME) * 1.5f;
-        float impulse_magnitude = 3.0f * impulse_scale; // Doubled from 3.0f for higher jumps
-        applyJumpImpulse(impulse_magnitude);
+        // Get current velocity to incorporate momentum
+        b2Vec2 current_velocity = b2Body_GetLinearVelocity(core_id_);
+
+        // Calculate jump impulse scaled by compression time
+        float impulse_scale = 1.0f + (compression_time_ / MAX_COMPRESSION_TIME) * 1.15f;
+        float vertical_impulse = 3.0f * impulse_scale;
+
+        // Add directional component based on input and current velocity
+        // Blend input direction with current horizontal momentum
+        float horizontal_impulse = 0.0f;
+        if (std::abs(input_direction) > 0.1f) {
+            // Input direction contributes to jump direction
+            horizontal_impulse = input_direction * 1.15f * impulse_scale;
+
+            // Add a portion of current velocity to preserve momentum
+            horizontal_impulse += current_velocity.x * 0.3f;
+        } else {
+            // No input, just preserve some current momentum
+            horizontal_impulse = current_velocity.x * 0.2f;
+        }
+
+        // Apply combined directional impulse
+        b2Vec2 impulse = {horizontal_impulse, vertical_impulse};
+        b2Body_ApplyLinearImpulseToCenter(core_id_, impulse, true);
     }
 
     compressing_ = false;

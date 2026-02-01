@@ -70,7 +70,14 @@ void GameSession::processInput(const InputSnapshot& input, float dt) {
     }
 
     if (input.jump_just_released && jump_held_) {
-        ball_->releaseJump();
+        // Pass horizontal input direction for directional jumps
+        float jump_direction = input.horizontal_axis;
+        if (std::abs(jump_direction) < 0.1f) {
+            // Fallback to discrete keys if analog axis is near zero
+            if (input.move_left) jump_direction = -1.0f;
+            else if (input.move_right) jump_direction = 1.0f;
+        }
+        ball_->releaseJump(jump_direction);
         jump_held_ = false;
     }
 }
@@ -146,6 +153,9 @@ void GameSession::restart() {
 
     // Reset scoring
     scoring_.reset();
+
+    // Reset level generator state
+    level_gen_.reset();
 
     // Recreate ball
     b2Vec2 start_pos = {5.0f, 3.0f};

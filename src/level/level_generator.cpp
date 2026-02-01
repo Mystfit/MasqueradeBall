@@ -182,3 +182,16 @@ LevelSegment LevelGenerator::generateGoalSegment() {
 
     return segment;
 }
+
+void LevelGenerator::reset() {
+    current_x_ = 0.0f;
+    current_y_ = 0.0f;
+    smoothed_y_ = 0.0f;
+    last_segment_end_x_ = 0.0f;
+    last_segment_end_y_ = 0.0f;
+    segments_generated_ = 0;
+    level_complete_ = false;
+
+    // Reset stdin reader to replay from beginning
+    reader_.reset();
+}
